@@ -1,0 +1,3 @@
+CREATE DATABASE IF NOT EXISTS `testing`;
+GRANT ALL ON `testing`.* TO 'default'@'%';
+FLUSH PRIVILEGES;
