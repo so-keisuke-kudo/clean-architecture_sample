@@ -7,23 +7,19 @@ jobs:
     env:
       PHP_VERSION: 7.4
     runs-on: ubuntu-latest
-
     services:
       mysql:
-        image: mariadb:10
+        image: mariadb:latest
         ports:
           - 3306
         options: --health-cmd "mysqladmin ping -h localhost" --health-interval 20s --health-timeout 10s --health-retries 10
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: test
-
     steps:
       - uses: actions/checkout@v2
-
       - name: Setup PHP
         run: sudo update-alternatives --set php /usr/bin/php${{env.PHP_VERSION}}
-
       - name: Cache PHP modules
         uses: actions/cache@v2
         env:
@@ -36,17 +32,6 @@ jobs:
             ${{ runner.os }}-
       - name: Install PHP modules
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
-      - name: Cache Node modules
-        uses: actions/cache@v2
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.OS }}-yarn-
-            ${{ runner.OS }}-
-      - name: yarn install & Run dev
-        run: yarn --ignore-engines && yarn dev
       - name: Application settings
         run: |
           php artisan key:generate --env=testing
