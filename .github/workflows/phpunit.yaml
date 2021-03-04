@@ -1,0 +1,61 @@
+name: phpunit
+
+on: push
+
+jobs:
+  testing:
+    env:
+      PHP_VERSION: 7.4
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mariadb:10
+        ports:
+          - 3306
+        options: --health-cmd "mysqladmin ping -h localhost" --health-interval 20s --health-timeout 10s --health-retries 10
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup PHP
+        run: sudo update-alternatives --set php /usr/bin/php${{env.PHP_VERSION}}
+
+      - name: Cache PHP modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-php-modules
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+            ${{ runner.os }}-
+      - name: Install PHP modules
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+      - name: Cache Node modules
+        uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-yarn-
+            ${{ runner.OS }}-
+      - name: yarn install & Run dev
+        run: yarn --ignore-engines && yarn dev
+      - name: Application settings
+        run: |
+          php artisan key:generate --env=testing
+      - name: Execute tests (Unit and Feature tests) via PHPUnit
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: ${{ job.services.mysql.ports['3306'] }}
+          DB_DATABASE: test
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: vendor/bin/phpunit
