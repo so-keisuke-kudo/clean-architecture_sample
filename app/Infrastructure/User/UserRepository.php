@@ -8,14 +8,16 @@ use Domain\Repositories\UserRepositoryInterface;
 
 final class UserRepository implements UserRepositoryInterface
 {
-    public function create(UserEntity $entity): void
+    public function create(UserEntity $entity): int
     {
-        User::create(
+        $user = User::create(
             [
                 'name' => $entity->userName->get(),
                 'email' => $entity->userEmail->get(),
                 'address' => $entity->address->get(),
             ]
         );
+
+        return $user->id;
     }
 }

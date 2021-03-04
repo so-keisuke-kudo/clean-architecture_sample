@@ -6,5 +6,5 @@ use Domain\Entities\UserEntity;
 
 interface UserRepositoryInterface
 {
-    public function create(UserEntity $entity);
+    public function create(UserEntity $entity): int;
 }

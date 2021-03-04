@@ -22,11 +22,12 @@ final class RegisterUser
      * @param string $userName
      * @param string $email
      * @param string $address
+     * @return int
      * @throws InvariantException
      */
-    public function execute(string $userName, string $email, string $address): void
+    public function execute(string $userName, string $email, string $address): int
     {
-        $this->userRepository->create(
+        return $this->userRepository->create(
             new UserEntity(
                 new UserName($userName),
                 new UserEmail($email),
