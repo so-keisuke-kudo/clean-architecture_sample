@@ -1,3 +1,5 @@
+[![phpunit](https://github.com/so-keisuke-kudo/clean-architecture_sample/actions/workflows/phpunit.yaml/badge.svg)](https://github.com/so-keisuke-kudo/clean-architecture_sample/actions/workflows/phpunit.yaml)  
+
 ```
 ├── app
 │   ├── Console
